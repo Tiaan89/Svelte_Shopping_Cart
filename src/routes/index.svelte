@@ -1,57 +1,53 @@
 <script>
-// @ts-nocheck
-
-    /**
-* @type {any[]}
-*/
-    let cart = [];
-    let products = [
-        {id: 1, name: "Apple", image: "https://th.bing.com/th/id/R.1e21679199854a3c125609204861201a?rik=VcCW7KgQX18H2w&pid=ImgRaw&r=0", price: 10, quantity: 1},
-        {id: 2, name: "Orange", image: "https://th.bing.com/th/id/OIP.s6QjeLMcWmQzyQXYo6vh3QHaG0?pid=ImgDet&rs=1", price: 11, quantity: 1},
-        {id: 3, name: "Grapes", image: "https://th.bing.com/th/id/R.5147164cd3954a0ce04538debad6d24d?rik=F9GfGvhE59ajfQ&pid=ImgRaw&r=0", price: 12, quantity: 1},
-    ]
+    import { products, cart, address } from "./cart.js";
 
     const addToCart = (/** @type {{ id: any; name?: string; image?: string; price?: number; quantity: any; }} */ product) => {
-        for(let item of cart) {
+        for(let item of $cart) {
             if(item.id === product.id) {
                 product.quantity += 1
-                cart = cart;
+                $cart = $cart;
                 return;
             }
         }
-        cart = [...cart, product];
+        $cart = [...$cart, product];
     }
         //alert("It works!")  --to test if the function works on the button!
 
-    $: total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0); 
+    $: total = $cart.reduce((sum, item) => sum + item.price * item.quantity, 0); 
 
         const minusItem = (product) => {
-            for(let item of cart) {
+            for(let item of $cart) {
                 if(item.id === product.id) {
                     product.quantity -= 1
-                    cart = cart;
+                    $cart = $cart;
                     return;
                 }
             }
-        cart = [...cart, product];
+        $cart = [...$cart, product];
         }
 
         const plusItem = (product) => {
-            for(let item of cart) {
+            for(let item of $cart) {
                 if(item.id === product.id) {
                     product.quantity += 1
-                    cart = cart;
+                    $cart = $cart;
                     return;
             }
         }
-        cart = [...cart, product];
+        $cart = [...$cart, product];
     }
+
+const checkOut = () => {
+    alert(JSON.stringify(cart))
+    alert(JSON.stringify(address))
+}
+
 </script>
 
-<p>There are {cart.length} items in your cart</p>
+<p>There are {$cart.length} items in your cart</p>
 
 <div class="product-list">
-    {#each products as product}
+    {#each $products as product}
         <div>
             <div class="image" style="background-image: url({product.image})"></div>
             <h4>{product.name}</h4>
@@ -62,7 +58,7 @@
 </div>
 
 <div class="cart-list">
-    {#each cart as item}
+    {#each $cart as item}
     {#if item.quantity > 0}
         <div class="cart-item">
             <img width="50" src={item.image} alt={item.name}>
@@ -80,27 +76,40 @@
 </div>
 
 <div class="shipping-address">
-    <p>Name</p>
-    <input />
+    <div>
+        <p>Name</p>
+        <input bind:value={$address.name}/>
 
-    <p>Email</p>
-    <input />
+        <p>Email</p>
+        <input bind:value={$address.email}/>
 
-    <p>Phone</p>
-    <input />
+        <p>Phone</p>
+        <input bind:value={$address.phone}/>
 
-    <p>Address</p>
-    <textarea cols="24" rows="6"/>
+        <p>Street</p>
+        <textarea cols="24" rows="6" bind:value={$address.street}/>
 
-    <p>City</p>
-    <input />
+        <p>City</p>
+        <input bind:value={$address.city}/>
 
-    <p>State</p>
-    <input />
+        <p>State</p>
+        <input bind:value={$address.state}/>
 
-    <p>PIN</p>
-    <input />
+        <p>PIN</p>
+        <input bind:value={$address.pin}/>
 
+        <button on:click={checkOut}>Checkout</button>
+    </div>
+
+    <div class="current-address">
+        <p>{$address.name}</p>
+        <p>{$address.email}</p>
+        <p>{$address.phone}</p>
+        <p>{$address.street}</p>
+        <p>{$address.city}</p>
+        <p>{$address.state}</p>
+        <p>{$address.pin}</p>
+    </div>
 </div>
 
 <style>
@@ -121,5 +130,14 @@
     .cart-list {
         border: 2px solid;
         padding: 10px;
+    }
+    .shipping-address {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-gap: 1em;
+    }
+    .current-address {
+        padding: 2em;
+        border: 2px dashed green;
     }
 </style>
